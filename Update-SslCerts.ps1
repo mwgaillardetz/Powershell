@@ -17,12 +17,12 @@
 
 .NOTES
 	Author: Matt Gaillardetz
-	Last Edit: 08-31-2022
-	Version 1.1
+	Last Edit: 09-1-2022
+	Version 1.2
 #>
 
 # Assign variables
-$certPath = "\\erpfileshare.tylertech.com\Public_Software\DevOpsTools\temp\star.tylertech.com-2023-c1-private.pfx"
+$certPath = "\\your-cert-path"
 $certName = Split-Path $certPath -leaf
 $pfxpass = Read-Host "Enter certificate Password" -AsSecureString
 
@@ -30,7 +30,7 @@ $pfxpass = Read-Host "Enter certificate Password" -AsSecureString
 # $servers = @('fdvmmunapptest')
 
 # Import list of servers with expiring cert into an array. Change to your local csv.
-$servers = Get-Content -Path 'C:\TylerDev\psScripts\update_ssl_certs\servers2.csv'
+$servers = Get-Content -Path '\\your-server-csv-path'
 
 # Copy certificate over to c:\temp on each server
 $servers | foreach-Object { copy-item -Path $certPath -Destination "\\$_\c`$\temp" }
@@ -60,7 +60,7 @@ $importCertificatesCommand = ({
     {
         foreach ($binding in $site.Bindings.Collection)
         {
-            if ($binding.protocol -eq 'https' -and  $binding.hostname -like '.tylertech.com')
+            if ($binding.protocol -eq 'https' -and  $binding.hostname -like '.cert.domain.youre.replacing.com')
             {
                 $binding.AddSslCertificate($newCert.Thumbprint, "my")
                 $newCert.FriendlyName = $certName
