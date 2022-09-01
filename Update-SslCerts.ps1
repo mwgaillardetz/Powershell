@@ -13,7 +13,7 @@
     seach for https bindings. After finding applicable https binding it will replace that cert
     with the new one you have uploaded.
     Note: If you need to generate list of sites nearing ssl cert expiration, run-
-    $/In-House Utilities/DevOps/Tyler.DevOps.PowerShell/Scripts/Get-ExpiringCerts.ps1
+    $/Get-ExpiringCerts.ps1
 
 .NOTES
 	Author: Matt Gaillardetz
