@@ -60,7 +60,7 @@ $importCertificatesCommand = ({
     {
         foreach ($binding in $site.Bindings.Collection)
         {
-            if ($binding.protocol -eq 'https' -and  $binding.hostname -like '.cert.domain.youre.replacing.com')
+            if ($binding.protocol -eq 'https' -and  $binding.BindingInformation -like '*.cert.domain.tobe.replaced.com')
             {
                 $binding.AddSslCertificate($newCert.Thumbprint, "my")
                 $newCert.FriendlyName = $certName
