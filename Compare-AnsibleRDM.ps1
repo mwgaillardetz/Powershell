@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-	Generates report of missing hosts present in RDM but missing from Ansible. 
+	Generates report of missing hosts present in Remote Desktop Manager, but missing from Ansible. 
 
 .DESCRIPTION
 	This script pulls the ansible production file from github, and 
