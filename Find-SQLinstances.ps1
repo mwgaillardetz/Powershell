@@ -3,7 +3,7 @@
 		Find all running sql instances within a Windows SQL server. 
 
 	.DESCRIPTION
-		This collects each instance on FDDB2 and adds the quotations and comma for each object.
+		This collects each instance on your specified server and adds the quotations and comma for each object.
         !-might be an issue-! The last entry has a comma at the end, and the proceeding command fails 
         because of this. 
 
@@ -14,7 +14,7 @@
 	#>
 
 # Declare server and csv path
-$SERVER= "FDDB2"
+$SERVER= "serverName"
 $sqlcsv = "C:\TylerDev\temp\sqlInstances.csv"
 
 function getSQLInstanceOnServer ([string]$SERVER) {
