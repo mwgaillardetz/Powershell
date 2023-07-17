@@ -3,10 +3,10 @@
 	Generates report of missing hosts present in Remote Desktop Manager, but missing from Ansible. 
 
 .DESCRIPTION
-	This script pulls the ansible production file from github, and 
-   	pulls an RDM inventory for Windows & Linux hosts with the tag 'ERPDevOps'.
+	This script pulls your ansible production file from github, and 
+   	pulls an RDM inventory for Windows & Linux hosts with the tag 'TeamName'.
     	A comparison is completed to output hosts missing from the Ansible production file, 
-    	but present in RDM's inventory. Results are saved under C:\TylerDev\temp\results.csv.
+    	but present in RDM's inventory. Results are saved under C:\temp\results.csv.
 
 .NOTES
 	Author: Matt Gaillardetz
