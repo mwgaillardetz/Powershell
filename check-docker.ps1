@@ -43,11 +43,8 @@ $processes = Get-Process -Name "*docker desktop*" -ErrorAction SilentlyContinue
 if ($null -eq $dockerstatus) {
     Write-Log -level ERROR -message "Docker service not found running. Starting..."
     Start-Service -Name "Docker Desktop Service"
-    # Add a sleep to give Docker some time to start up
-    #Start-Sleep -Seconds 10
-    #Write-Host "Docker is now running."
 } else {
-    #Write-Host "Docker is already running."
+    Write-Log -level INFO -message "Docker service already running, no action needed."
 }
 
 # Run docker desktop if it isn't running"
