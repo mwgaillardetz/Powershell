@@ -15,7 +15,7 @@
 
 # Declare server and csv path
 $SERVER= "serverName"
-$sqlcsv = "C:\TylerDev\temp\sqlInstances.csv"
+$sqlcsv = "C:\temp\sqlInstances.csv"
 
 function getSQLInstanceOnServer ([string]$SERVER) {
     $services = Get-Service -Computer $SERVER
