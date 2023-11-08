@@ -1,3 +1,5 @@
+# Almost complete - need to refine condition report process
+
 # Define the URL of the World of Warcraft server status page
 $url = "https://worldofwarcraft.blizzard.com/en-us/game/status/us"
 
