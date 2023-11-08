@@ -1,5 +1,5 @@
 # Almost complete - need to refine condition report process. 
-# Script checks Blizzard's site every 10 minutes to see if your realm is online and ready to rumble. 
+# Script checks Blizzard's site every 10 minutes and reports to your discord server when your realm is online and ready to rumble. 
 
 # Define the URL of the World of Warcraft server status page
 $url = "https://worldofwarcraft.blizzard.com/en-us/game/status/us"
