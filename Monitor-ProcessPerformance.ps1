@@ -60,7 +60,7 @@ $sortedResults = $processedResults | Sort-Object -Property Age,CPU -Descending
 
 # Check if any processes running for an hour or more were found
 if ($sortedResults.Count -gt 0) {
-    Write-Error "Discovered fglrun processes running for an hour or more: "
+    Write-Error "Discovered processes running for an hour or more: "
     $sortedResults | Format-Table -AutoSize
 } else {
     Write-Host "No long-running processes found! "
