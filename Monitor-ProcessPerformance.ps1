@@ -1,73 +1,67 @@
-# Specify the process name you'd like to track
-$processName = "your-process-name"
+# Define process to monitor
+$processName = "process-name"
 
-# Get all running processes with the specified name
-$matchingProcesses = Get-Process | Where-Object { $_.ProcessName -eq $processName }
+Write-Host "Beginning search. If process owner isn't found, 'NA' will be the column assigned value."
+Write-Host "A process is considered 'orphaned' if a parent process is missing."
 
-# Define an array to store the results
-$results = @()
+# Retrieve the process' information
+$processes = Get-Process | Where-Object { $_.ProcessName -eq $processName }
 
-
-Write-Host "Beginning search. If process owner isn't found, 'NA' will be the column assigned value. "
-foreach ($process in $matchingProcesses) {
+# Analyze and organize the processes in parallel
+$processedResults = $processes | ForEach-Object -Parallel {
+    $process = $_  # The current process object
     $processStartTime = $process.StartTime
+    $processId = $_.Id # The current process' ID
     if ($processStartTime -is [System.DateTime]) {
-        $processAge = (Get-Date) - $processStartTime
+        $processAge = (Get-Date) - $processStartTime  # Precise process age
         $cpuTime = $process.TotalProcessorTime.TotalMilliseconds
         $totalCPUTime = (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue * $processAge.TotalMilliseconds
-        # Alternate CPU usage retrieval method - Returns amount of CPU used by the process as a time-based value.
-        # $cpu = $process.CPU
-        # $cpuUsage = [Math]::Round($cpu, 2)  # Rounds the above number into an easily consumable value
 
         if ($totalCPUTime -gt 0) {
             $cpuUsage = [Math]::Round(($cpuTime / $totalCPUTime) * 100, 2)
         } else {
-            $cpuUsage = 0  # Set to 0 if totalCPUTime is 0 to avoid division by zero
+            $cpuUsage = 0
         }
     } else {
-        Write-Host "Process start time not available or in an unexpected format for process $($process.ProcessName)."
+        # Write-Host "Process start time not available or in an unexpected format for $($process.ProcessName) process."
+        return  # Skip to the next process
     }
-        try {
-            $owner = $process.GetOwner().User
-        } catch {
-            $owner = "NA"
-        }
-        # Look for matching processes that have been running for over an hour.
-        # You can also set a specific cpu percentage to report on (Default 0)
-        if ($processAge.TotalSeconds -ge 3600 -and $cpuUsage -ge 0) {
-            $result = [PSCustomObject]@{
+
+    try {
+        $ownerInfo = (Get-CimInstance Win32_Process -Filter "ProcessId = $processId")
+        $owner = Invoke-CimMethod -InputObject $ownerInfo -MethodName GetOwner | Select-Object -ExpandProperty user
+    } catch {
+        $owner = "NA"
+    }
+
+    # Check if the process is orphaned
+    $isOrphaned = (Get-CimInstance -ClassName Win32_Process -Filter "ProcessId = $($process.Id)").ParentProcessId -eq 0
+    if ($isOrphaned){
+        $orphaned = "Yes"
+    } else{
+        $orphaned = "No"
+    }
+
+    # Determine if process is at least an hour old, and using at least 2% total CPU
+    if ($processAge.TotalSeconds -ge 3600 -and $cpuUsage -ge 0.02) {
+        [PSCustomObject]@{
             Name = $process.ProcessName
-            ProcessID = $process.Id
+            ProcessID = $processId
             Age = $processAge
             CPU = $cpuUsage
             Owner = $owner
+            Orphaned = $orphaned
         }
-        }
-
-        $results += $result
     }
+} -ThrottleLimit 5
 
 # Sort the results by Age & CPU in descending order
-$sortedResults = $results | Sort-Object -Property Age,CPU -Descending
-
-
-# Identify orphaned processes, output results
-$orphanedProcesses = $results | Where-Object {
-    (Get-CimInstance -ClassName Win32_Process -Filter "ParentProcessId = $($_.ProcessID)").Count -eq 0
-}
-if ($orphanedProcesses) {
-Write-Host "Orphaned processes discovered: "
-$orphanedProcesses | Format-Table -AutoSize
-}
-if (!$orphanedProcesses) {
-Write-Host "No orphaned processes found. "
-}
-
+$sortedResults = $processedResults | Sort-Object -Property Age,CPU -Descending
 
 # Check if any processes running for an hour or more were found
-if ($results.Count -gt 0) {
+if ($sortedResults.Count -gt 0) {
     Write-Error "Discovered fglrun processes running for an hour or more: "
-    $sortedResults  | Format-Table -AutoSize
+    $sortedResults | Format-Table -AutoSize
 } else {
-    Write-Host "No long-running processes found. "
+    Write-Host "No long-running processes found! "
 }
