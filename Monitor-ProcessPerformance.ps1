@@ -1,5 +1,5 @@
 # Define process to monitor
-$processName = "process-name"
+$processName = "your-process-name"
 
 Write-Host "Beginning search. If process owner isn't found, 'NA' will be the column assigned value."
 Write-Host "A process is considered 'orphaned' if a parent process is missing."
@@ -13,20 +13,15 @@ $processedResults = $processes | ForEach-Object -Parallel {
     $processStartTime = $process.StartTime
     $processId = $_.Id # The current process' ID
     if ($processStartTime -is [System.DateTime]) {
+        # Calculate average process' cpu usage
         $processAge = (Get-Date) - $processStartTime  # Precise process age
         $cpuTime = $process.TotalProcessorTime.TotalMilliseconds
-        $totalCPUTime = (Get-Counter '\Processor(_Total)\% Processor Time').CounterSamples.CookedValue * $processAge.TotalMilliseconds
-
-        if ($totalCPUTime -gt 0) {
-            $cpuUsage = [Math]::Round(($cpuTime / $totalCPUTime) * 100, 2)
-        } else {
-            $cpuUsage = 0
-        }
+        $numberOfProcessors = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
+        $cpuUsage = [Math]::Round(($cpuTime / ($numberOfProcessors * $processAge.TotalMilliseconds)) * 100, 2)
     } else {
         # Write-Host "Process start time not available or in an unexpected format for $($process.ProcessName) process."
         return  # Skip to the next process
     }
-
     try {
         $ownerInfo = (Get-CimInstance Win32_Process -Filter "ProcessId = $processId")
         $owner = Invoke-CimMethod -InputObject $ownerInfo -MethodName GetOwner | Select-Object -ExpandProperty user
@@ -43,12 +38,12 @@ $processedResults = $processes | ForEach-Object -Parallel {
     }
 
     # Determine if process is at least an hour old, and using at least 2% total CPU
-    if ($processAge.TotalSeconds -ge 3600 -and $cpuUsage -ge 0.02) {
+    if ($processAge.TotalSeconds -ge 3600 -and $cpuUsage -ge 1) {
         [PSCustomObject]@{
             Name = $process.ProcessName
-            ProcessID = $processId
+            "Process ID" = $processId
             Age = $processAge
-            CPU = $cpuUsage
+            "Average CPU" = "$cpuUsage%"
             Owner = $owner
             Orphaned = $orphaned
         }
@@ -56,7 +51,7 @@ $processedResults = $processes | ForEach-Object -Parallel {
 } -ThrottleLimit 5
 
 # Sort the results by Age & CPU in descending order
-$sortedResults = $processedResults | Sort-Object -Property Age,CPU -Descending
+$sortedResults = $processedResults | Sort-Object -Property Age,AverageCPU -Descending
 
 # Check if any processes running for an hour or more were found
 if ($sortedResults.Count -gt 0) {
