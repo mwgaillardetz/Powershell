@@ -2,7 +2,6 @@
 $processName = "your-process-name"
 
 Write-Host "Beginning search. If process owner isn't found, 'NA' will be the column assigned value."
-Write-Host "A process is considered 'orphaned' if a parent process is missing."
 
 # Retrieve the process' information
 $processes = Get-Process | Where-Object { $_.ProcessName -eq $processName }
