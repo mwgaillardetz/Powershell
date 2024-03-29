@@ -53,7 +53,7 @@ Write-Host "RDM inventory successfully created."
 
 # Download erpDevOps ansible repo to local folder & add the header 'FullName'
 Write-Host "Cloning erp-devops-ansible repo for latest inventory file."
-gh repo clone tyler-technologies/erp-devops-ansible c:\tylerdev\temp\ansible
+gh repo clone your-ansible/repo c:\tylerdev\temp\ansible
 $ansibleMaster = "C:\temp\ansible\production"
 $ansibleProd = "C:\temp\ansibleProduction.csv"
 $ansibleItems = Get-Content -Path $ansibleMaster
