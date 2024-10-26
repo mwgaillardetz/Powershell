@@ -27,7 +27,7 @@ $certName = Split-Path $certPath -leaf
 $pfxpass = Read-Host "Enter certificate Password" -AsSecureString
 
 # Use if you would like to run against individual server(s).
-# $servers = @('fdvmmunapptest')
+# $servers = @('server-name')
 
 # Import list of servers with expiring cert into an array. Change to your local csv.
 $servers = Get-Content -Path '\\your-server-csv-path'
