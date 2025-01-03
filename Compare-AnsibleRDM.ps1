@@ -36,7 +36,7 @@ if (Test-Path $rdmcsv) {
     Remove-Item -Path $rdmcsv -Force
 }
 
-# Retrieve inventory from RDM. Only collecting hosts that are 'live', POC is ERP DevOps, and wsus:Yes. 
+# Retrieve inventory from RDM. Only collecting hosts that are 'live' 
 Write-Host "Generating RDM inventory..."
 $RDMServers = Get-RDMSession | 
 Where-Object {($_.MetaInformation.Keywords -eq "TeamName") -and (($_.Group -eq "Parent-Folder\Live Linux Machines") -or ($_.Group -eq "Parent-Folder\Live Windows Machines"))} |
@@ -51,9 +51,9 @@ $RDMServers | Export-Csv $rdmcsv -notypeinformation;
 Write-Host "RDM inventory successfully created."
 
 
-# Download erpDevOps ansible repo to local folder & add the header 'FullName'
-Write-Host "Cloning erp-devops-ansible repo for latest inventory file."
-gh repo clone your-ansible/repo c:\tylerdev\temp\ansible
+# Download your ansible repo to local folder & add the header 'FullName'
+Write-Host "Cloning ansible repo for latest inventory file."
+gh repo clone your-ansible/repo c:\temp\ansible
 $ansibleMaster = "C:\temp\ansible\production"
 $ansibleProd = "C:\temp\ansibleProduction.csv"
 $ansibleItems = Get-Content -Path $ansibleMaster
