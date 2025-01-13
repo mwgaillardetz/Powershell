@@ -20,7 +20,7 @@ foreach ($db in $databases) {
         $MigratingDatabase = $parts[1]
 
         # Modify the destination instance name based on the source instance name
-        $DestinationInstance = $parts[0] -replace 'DEV', 'CLIENT' -replace 'QA', 'CLIENT' -replace 'SHARED', 'CLIENT'
+        $DestinationInstance = $parts[0] -replace 'name to replace', 'replace-with-name'
         $DestinationServer = "destinationFQDN.com\$DestinationInstance"
 
         # Get the current owner of the database
